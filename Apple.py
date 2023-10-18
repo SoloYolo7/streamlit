@@ -3,21 +3,23 @@ import streamlit as st
 import pandas as pd
 
 st.write("""
-# My stock prices app
+# Simple Stock Price App
          
-This app shows Apple **closing** price and **volume**
-
+Shown are the stock closing price and volume of Apple!
+         
 """)
+         
+tickerSymbol = 'AAPL'
 
-ticker_symbol = 'AAPL'
-stock_data = yf.Ticker(ticker_symbol)
-stock_df = stock_data.history(period='1d',start='2013-10-17',end='2023-10-17')
+tickerData = yf.Ticker(tickerSymbol)
+
+tickerDf = tickerData.history(period='1d', start='2010-5-31', end='2020-5-31')
 
 st.write("""
-## Closing price
+## Closing Price
 """)
-st.line_chart(stock_df.Close)
+st.line_chart(tickerDf.Close)
 st.write("""
-## Volume
+## Volume Price
 """)
-st.line_chart(stock_df.Volume)
+st.line_chart(tickerDf.Volume)

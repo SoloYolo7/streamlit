@@ -1,65 +1,90 @@
+import math
+
 import pandas as pd
-import seaborn as sns
+import numpy as np
+import streamlit as st
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Загрузка данных
-url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-df = pd.read_csv(url)
+path = 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv'
 
-# 1) Гистограмма total_bill
-plt.figure(figsize=(10, 6))
-sns.histplot(df['total_bill'], bins=30, kde=True)
-plt.title('Гистограмма total_bill')
-plt.show()
+tips = pd.read_csv(path)
 
-# 2) Scatterplot между total_bill и tip
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='total_bill', y='tip', data=df)
-plt.title('Связь между total_bill и tip')
-plt.show()
+st.write("""
+         
+#         Исследование по чаевым
+         
+""")
+         
+fig1, ax1 = plt.subplots()
+sns.histplot(data=tips['total_bill'], bins=10) 
+plt.xlabel("Total Bill")
+plt.ylabel("Count")
+plt.title("Histogram of Total Bill")
+st.pyplot(fig1)
 
-# 3) График связывающий total_bill, tip, и size
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='total_bill', y='tip', hue='size', data=df, palette='viridis', size='size', sizes=(20,200))
-plt.title('Связь между total_bill, tip и size')
-plt.show()
+fig2, ax2 = plt.subplots()
+sns.scatterplot(data=tips, x="total_bill", y="tip")
+plt.xlabel("Total Bill")
+plt.ylabel("Tip")
+plt.title("Scatterplot of Total Bill vs. Tip")
+st.pyplot(fig2)
 
-# 4) Связь между днем недели и размером счета
-plt.figure(figsize=(10, 6))
-sns.boxplot(x='day', y='total_bill', data=df)
-plt.title('Связь между днем недели и размером счета')
-plt.show()
+fig3, ax3 = plt.subplots()
+sns.scatterplot(data=tips, x="total_bill", y="tip", hue="size")
+plt.xlabel("Total Bill")
+plt.ylabel("Tip")
+plt.title("Scatterplot of Total Bill, Tip, and Size")
+plt.legend(title="Size")
+st.pyplot(fig3)
 
-# 5) Scatter plot с днем недели по оси y, чаевыми по оси x, и цветом по полу
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='tip', y='day', hue='sex', data=df)
-plt.title('Чаевые в зависимости от дня недели и пола')
-plt.show()
+fig4, ax4 = plt.subplots()
+sns.barplot(data=tips, x="day", y="total_bill", errorbar=None)
+plt.xlabel("Day of the Week")
+plt.ylabel("Average Total Bill")
+plt.title("Average Total Bill by Day of the Week")
+st.pyplot(fig4)
 
-# 6) Box plot с суммой всех счетов за каждый день, разбивая по time (Dinner/Lunch)
-plt.figure(figsize=(10, 6))
-sns.boxplot(x='day', y='total_bill', hue='time', data=df)
-plt.title('Сумма счетов по дням и времени')
-plt.show()
+fig5, ax5 = plt.subplots()
+sns.scatterplot(x="tip", y="day", hue="sex", data=tips, palette={"Male": "b", "Female": "r"}, s=100)
+plt.xlabel("Чаевые")
+plt.ylabel("День недели")
+plt.title("Scatter Plot с днем недели, чаевыми и полом")
+st.pyplot(fig5)
 
-# 7) Две гистограммы чаевых на обед и ланч рядом
-plt.figure(figsize=(14, 6))
+fig6, ax6 = plt.subplots()
+sns.boxplot(x="day", y="total_bill", hue="time", data=tips, palette="coolwarm")
+plt.xlabel("День")
+plt.ylabel("Общий счет")
+plt.title("Box Plot общего счета по дням и времени приема пищи")
+st.pyplot(fig6)
+
+fig7, ax7 = plt.subplots()
 plt.subplot(1, 2, 1)
-sns.histplot(df[df['time'] == 'Lunch']['tip'], bins=30, kde=True, color='blue')
-plt.title('Чаевые на Lunch')
+sns.histplot(data=tips[tips['time'] == 'Lunch'], x='tip', kde=True, color='blue')
+plt.title("Гистограмма чаевых на обед")
+plt.xlabel("Чаевые")
+plt.ylabel("Частота")
 plt.subplot(1, 2, 2)
-sns.histplot(df[df['time'] == 'Dinner']['tip'], bins=30, kde=True, color='red')
-plt.title('Чаевые на Dinner')
+sns.histplot(data=tips[tips['time'] == 'Dinner'], x='tip', kde=True, color='green')
+plt.title("Гистограмма чаевых на ужин")
+plt.xlabel("Чаевые")
+plt.ylabel("Частота")
 plt.tight_layout()
-plt.show()
+st.pyplot(fig7)
 
-# 8) Два scatterplots для мужчин и женщин, с разбивкой по курящим/некурящим
-plt.figure(figsize=(14, 6))
+fig8, ax8 = plt.subplots()
 plt.subplot(1, 2, 1)
-sns.scatterplot(x='total_bill', y='tip', hue='smoker', data=df[df['sex'] == 'Male'])
-plt.title('Мужчины: total_bill vs tip')
+sns.scatterplot(data=tips[tips['sex'] == 'Male'], x='total_bill', y='tip', hue='smoker', palette='Set1')
+plt.title("Scatter plot для мужчин")
+plt.xlabel("Размер счета")
+plt.ylabel("Чаевые")
 plt.subplot(1, 2, 2)
-sns.scatterplot(x='total_bill', y='tip', hue='smoker', data=df[df['sex'] == 'Female'])
-plt.title('Женщины: total_bill vs tip')
+sns.scatterplot(data=tips[tips['sex'] == 'Female'], x='total_bill', y='tip', hue='smoker', palette='Set1')
+plt.title("Scatter plot для женщин")
+plt.xlabel("Размер счета")
+plt.ylabel("Чаевые")
 plt.tight_layout()
-plt.show()
+st.pyplot(fig8)
